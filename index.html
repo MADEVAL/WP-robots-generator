@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Генератор robots.txt для WordPress — онлайн инструмент | GLOBUS.studio</title>
+  <meta name="description" content="Быстрый умный генератор robots.txt для WordPress. Выберите поисковые системы, уровень безопасности, сайтмап и плагины. Копируйте или скачивайте готовый файл." />
+  <meta name="keywords" content="robots.txt, WordPress, генератор, SEO, sitemap, Yandex, Googlebot" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Генератор robots.txt для WordPress — GLOBUS.studio" />
+  <meta property="og:description" content="Умный генератор robots.txt для WordPress с поддержкой Yandex, Google, Bing. Выбор уровня защиты, сайтмапа и плагинов." />
+  <meta property="og:url" content="" id="ogUrl" />
+  <meta property="og:image" content="" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Генератор robots.txt для WordPress" />
+  <meta name="twitter:description" content="Соберите robots.txt под ваш сайт на WordPress за минуты." />
+  <link rel="canonical" href="" id="canonicalLink" />
+  <link rel="alternate" href="" hreflang="ru" id="altRu" />
+  <link rel="alternate" href="" hreflang="en" id="altEn" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='24' fill='%232196F3'/%3E%3Ctext x='50%25' y='58%25' dominant-baseline='middle' text-anchor='middle' font-size='64' fill='white'%3ER%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <script>window.__BUILD_TIME__ = new Date().toISOString();</script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">R</div>
+      <div class="titles">
+        <h1 data-i18n="appTitle">Генератор robots.txt для WordPress</h1>
+        <p class="subtitle" data-i18n="appSubtitle">Соберите корректный robots.txt за минуты</p>
+      </div>
+    </div>
+    <div class="lang-switch" role="group" aria-label="Language switch">
+      <button class="btn btn-ghost" data-lang="ru" id="langRu" aria-pressed="true">RU</button>
+      <button class="btn btn-ghost" data-lang="en" id="langEn" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card" id="controls">
+      <h2 class="card-title" data-i18n="sectionSetup">Настройки</h2>
+      <form id="generatorForm" novalidate>
+        <div class="field">
+          <label for="siteUrl" data-i18n="labelSiteUrl">Адрес сайта (https://example.com)</label>
+          <input id="siteUrl" name="siteUrl" type="url" inputmode="url" placeholder="https://example.com" required pattern="https://.*" title="Введите полный URL на HTTPS, например https://example.com" autofocus />
+          <small class="hint" data-i18n="hintSiteUrl">Нужен для правил Host/Yandex и карты сайта</small>
+        </div>
+
+        <div class="field">
+          <label data-i18n="labelEngines">Целевые поисковые системы</label>
+          <div class="chips" id="engines">
+            <label class="chip"><input type="checkbox" value="all" checked /> <span data-i18n="engineAll">Все</span></label>
+            <label class="chip"><input type="checkbox" value="Googlebot" /> Google</label>
+            <label class="chip"><input type="checkbox" value="Bingbot" /> Bing</label>
+            <label class="chip"><input type="checkbox" value="Yandex" /> Yandex</label>
+            <label class="chip"><input type="checkbox" value="DuckDuckBot" /> DuckDuckGo</label>
+            <label class="chip"><input type="checkbox" value="Baiduspider" /> Baidu</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="security" data-i18n="labelSecurity">Уровень безопасности</label>
+          <select id="security" name="security">
+            <option value="low" data-i18n="secLow">Низкий (минимальные запреты)</option>
+            <option value="rec" selected data-i18n="secRec">Рекомендуется (баланс индекс/безопасность)</option>
+            <option value="high" data-i18n="secHigh">Высокий (строже; риск пропуска ресурсов)</option>
+          </select>
+          <small class="hint" data-i18n="hintSecurity">Строже правила могут помешать индексации ресурсов темы/плагинов</small>
+        </div>
+
+        <div class="field">
+          <label data-i18n="labelPlugins">Плагины WordPress</label>
+          <div class="chips" id="plugins">
+            <label class="chip"><input type="checkbox" value="woocommerce" /> WooCommerce</label>
+            <label class="chip"><input type="checkbox" value="edd" /> Easy Digital Downloads</label>
+          </div>
+          <small class="hint" data-i18n="hintPlugins">Некоторые плагины добавляют служебные страницы (корзина/оформление), лучше скрывать из индекса</small>
+        </div>
+
+        <div class="field">
+          <label class="row">
+            <span data-i18n="labelSitemap">Добавить Sitemap</span>
+            <label class="switch">
+              <input type="checkbox" id="addSitemap" checked />
+              <span class="slider"></span>
+            </label>
+          </label>
+          <input id="sitemapUrl" type="url" inputmode="url" placeholder="https://example.com/sitemap.xml" />
+          <small class="hint" data-i18n="hintSitemap">Если используете Yoast/RankMath — обычно sitemap_index.xml</small>
+        </div>
+
+        <details class="field">
+          <summary data-i18n="labelAdvanced">Дополнительно</summary>
+          <div class="stack">
+            <label class="row">
+              <span data-i18n="optYandexHost">Директива Host для Yandex</span>
+              <label class="switch">
+                <input type="checkbox" id="useYandexHost" />
+                <span class="slider"></span>
+              </label>
+            </label>
+            <label class="row">
+              <span data-i18n="optCrawlDelay">Crawl-delay (Bing/Yandex)</span>
+              <input type="number" id="crawlDelay" min="1" max="20" step="1" placeholder="5" style="max-width:120px" />
+            </label>
+            <label class="row">
+              <span data-i18n="optYandexClean">Yandex Clean-param (utm_* и др.)</span>
+              <label class="switch">
+                <input type="checkbox" id="yandexClean" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+        </details>
+
+        <div class="actions">
+          <button type="button" id="btnGenerate" class="btn btn-primary" data-i18n="btnGenerate">Сгенерировать</button>
+          <button type="button" id="btnReset" class="btn" data-i18n="btnReset">Сброс</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="output">
+      <h2 class="card-title" data-i18n="sectionOutput">Результат</h2>
+      <pre class="code" id="robotsPreview" aria-live="polite" tabindex="0"></pre>
+      <div class="actions">
+        <button type="button" id="btnCopy" class="btn" data-i18n="btnCopy">Копировать</button>
+        <button type="button" id="btnDownload" class="btn btn-primary" data-i18n="btnDownload">Скачать robots.txt</button>
+      </div>
+      <p class="note" data-i18n="disclaimer">Важно: чрезмерные ограничения могут ухудшить индексацию. Проверяйте правила в Google Search Console и Яндекс.Вебмастер.</p>
+    </section>
+      <section class="card" id="seoContent">
+        <h2 class="card-title" data-i18n="seoHeading">Как составить идеальный robots.txt для WordPress</h2>
+        <div class="longform">
+          <p data-i18n="seoIntro">Правильный robots.txt помогает поисковым системам эффективнее обходить сайт, экономить краулинговый бюджет и избегать индексации служебных страниц. Ниже — практические советы и частые вопросы.</p>
+          <h3 data-i18n="seoBest">Лучшие практики</h3>
+          <ul>
+            <li data-i18n="seoBest1">Не закрывайте CSS/JS ассеты темы и плагинов — иначе ухудшится рендеринг и оценка качества страниц.</li>
+            <li data-i18n="seoBest2">Закрывайте административные и персональные разделы (wp-admin, корзина/checkout), чтобы не засорять индекс.</li>
+            <li data-i18n="seoBest3">Добавляйте корректный Sitemap для быстрой переиндексации и обнаружения новых страниц.</li>
+            <li data-i18n="seoBest4">Используйте умеренный уровень ограничений («Рекомендуется») и проверяйте файл в Search Console/Вебмастере.</li>
+          </ul>
+          <h3 data-i18n="faqHeading">FAQ</h3>
+          <details open>
+            <summary data-i18n="faqQ1">Нужно ли добавлять директиву Host для Яндекса?</summary>
+            <p data-i18n="faqA1">Host помогает указать основное зеркало — добавляйте, если используете Яндекс и у сайта есть зеркала с www/без www.</p>
+          </details>
+          <details>
+            <summary data-i18n="faqQ2">Можно ли закрыть /wp-content/ и /wp-includes/?</summary>
+            <p data-i18n="faqA2">Не рекомендуется — там находятся необходимые стили и скрипты. Строгое закрытие может повредить индексации.</p>
+          </details>
+          <details>
+            <summary data-i18n="faqQ3">Что такое Crawl-delay и когда его использовать?</summary>
+            <p data-i18n="faqA3">Директива замедляет скорость краулинга для отдельных ботов (например Bing/Yandex). Используйте, если сервер перегружается от обхода.</p>
+          </details>
+        </div>
+      </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>
+      <span data-i18n="devBy">Разработчик</span> <a href="https://globus.studio" target="_blank" rel="noopener">GLOBUS.studio</a> ·
+      <a href="https://globus.studio/contacts/" target="_blank" rel="noopener" data-i18n="orderDev">Заказать разработку</a>
+      · <a href="https://t.me/GLOBUSstudio" target="_blank" rel="noopener">Telegram</a>
+    </p>
+    <small id="buildInfo"></small>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
