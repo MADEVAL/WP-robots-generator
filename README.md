@@ -2,7 +2,7 @@
 
 > Smart, free, client-side robots.txt generator built specifically for WordPress sites. No backend, no tracking, no signup - just open and go.
 
-**[Live Demo →](https://globus.studio)**
+**[Live Demo →](https://robots.globus.studio)**
 
 ---
 
@@ -64,19 +64,6 @@ Every WordPress site needs a `robots.txt`. Most online generators spit out a gen
 └── README.md
 ```
 
-## Quick Start
-
-```bash
-# Clone
-git clone https://github.com/AnotherGlobusStudio/wp-robots-generator.git
-cd wp-robots-generator
-
-# Open directly - no build step needed
-open index.html
-# or serve locally
-npx serve .
-```
-
 ## How It Works
 
 1. Enter your site URL (HTTPS required)
@@ -108,4 +95,4 @@ MIT
 
 ---
 
-Built by [GLOBUS.studio](https://globus.studio)
+Built by [GLOBUS.studio](https://globus.studio) . [Yevhen Leonidov](https://leonidov.dev)
