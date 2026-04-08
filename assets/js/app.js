@@ -22,7 +22,7 @@
       hintSecurity: "Строже правила могут помешать индексации ресурсов темы/плагинов",
       labelPlugins: "Плагины WordPress",
       labelSitemap: "Добавить Sitemap",
-      hintSitemap: "Если используете Yoast/RankMath — обычно sitemap_index.xml",
+      hintSitemap: "Если используете Yoast/RankMath - обычно sitemap_index.xml",
       labelAdvanced: "Дополнительно",
       optYandexHost: "Директива Host для Yandex",
       optCrawlDelay: "Crawl-delay (Bing/Yandex)",
@@ -36,20 +36,20 @@
       disclaimer: "Важно: чрезмерные ограничения могут ухудшить индексацию. Проверяйте правила в Google Search Console и Яндекс.Вебмастер.",
       devBy: "Разработчик",
       orderDev: "Заказать разработку",
-      seoTitle: "Генератор robots.txt для WordPress — онлайн инструмент | GLOBUS.studio",
+      seoTitle: "Генератор robots.txt для WordPress - онлайн инструмент | GLOBUS.studio",
       seoDesc: "Умный генератор robots.txt для WordPress: Google, Yandex, Bing. Уровни безопасности, карта сайта, поддержка плагинов. Быстро и бесплатно.",
       seoHeading: "Как составить идеальный robots.txt для WordPress",
-      seoIntro: "Правильный robots.txt помогает поисковым системам эффективнее обходить сайт, экономить краулинговый бюджет и избегать индексации служебных страниц. Ниже — практические советы и частые вопросы.",
+      seoIntro: "Правильный robots.txt помогает поисковым системам эффективнее обходить сайт, экономить краулинговый бюджет и избегать индексации служебных страниц. Ниже - практические советы и частые вопросы.",
       seoBest: "Лучшие практики",
-      seoBest1: "Не закрывайте CSS/JS ассеты темы и плагинов — иначе ухудшится рендеринг и оценка качества страниц.",
+      seoBest1: "Не закрывайте CSS/JS ассеты темы и плагинов - иначе ухудшится рендеринг и оценка качества страниц.",
       seoBest2: "Закрывайте административные и персональные разделы (wp-admin, корзина/checkout), чтобы не засорять индекс.",
       seoBest3: "Добавляйте корректный Sitemap для быстрой переиндексации и обнаружения новых страниц.",
       seoBest4: "Используйте умеренный уровень ограничений («Рекомендуется») и проверяйте файл в Search Console/Вебмастере.",
       faqHeading: "FAQ",
       faqQ1: "Нужно ли добавлять директиву Host для Яндекса?",
-      faqA1: "Host помогает указать основное зеркало — добавляйте, если используете Яндекс и у сайта есть зеркала с www/без www.",
+      faqA1: "Host помогает указать основное зеркало - добавляйте, если используете Яндекс и у сайта есть зеркала с www/без www.",
       faqQ2: "Можно ли закрыть /wp-content/ и /wp-includes/?",
-      faqA2: "Не рекомендуется — там находятся необходимые стили и скрипты. Строгое закрытие может повредить индексации.",
+      faqA2: "Не рекомендуется - там находятся необходимые стили и скрипты. Строгое закрытие может повредить индексации.",
       faqQ3: "Что такое Crawl-delay и когда его использовать?",
       faqA3: "Директива замедляет скорость краулинга для отдельных ботов (например Bing/Yandex). Используйте, если сервер перегружается от обхода.",
       faqQ4: "Как проверить robots.txt?",
@@ -93,12 +93,12 @@
       disclaimer: "Note: overly strict rules can harm indexing. Validate in Search Console and Yandex.Webmaster.",
       devBy: "Built by",
       orderDev: "Hire us",
-      seoTitle: "robots.txt Generator for WordPress — online tool | GLOBUS.studio",
+      seoTitle: "robots.txt Generator for WordPress - online tool | GLOBUS.studio",
       seoDesc: "Smart robots.txt generator for WordPress: Google, Yandex, Bing. Security levels, sitemap, plugin-aware. Fast and free.",
       seoHeading: "How to craft a perfect robots.txt for WordPress",
       seoIntro: "A proper robots.txt guides crawlers, saves crawl budget, and avoids indexing utility pages. Below are practical tips and FAQs.",
       seoBest: "Best practices",
-      seoBest1: "Do not block theme/plugin CSS/JS assets — this degrades rendering and quality signals.",
+      seoBest1: "Do not block theme/plugin CSS/JS assets - this degrades rendering and quality signals.",
       seoBest2: "Block administrative and personal areas (wp-admin, cart/checkout) to keep the index clean.",
       seoBest3: "Add a correct Sitemap to speed up reindexing and discovery.",
       seoBest4: "Use a balanced restrictions level (Recommended) and verify in Search Console.",
@@ -106,7 +106,7 @@
       faqQ1: "Should I add Yandex Host?",
       faqA1: "Host helps specify the main mirror. Add it when using Yandex and you have www/non-www mirrors.",
       faqQ2: "Can I block /wp-content/ and /wp-includes/?",
-      faqA2: "Not recommended — they contain required CSS/JS. Strict blocking harms indexing.",
+      faqA2: "Not recommended - they contain required CSS/JS. Strict blocking harms indexing.",
       faqQ3: "What is Crawl-delay and when to use it?",
       faqA3: "It slows crawl rate for specific bots (e.g., Bing/Yandex). Use if crawling overloads your server.",
       faqQ4: "How to verify robots.txt?",
@@ -146,7 +146,7 @@
     const metaDesc = $('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', i18n[lang].seoDesc);
     const ogTitle = $('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', i18n[lang].appTitle + ' — GLOBUS.studio');
+    if (ogTitle) ogTitle.setAttribute('content', i18n[lang].appTitle + ' - GLOBUS.studio');
     const ogDesc = $('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', i18n[lang].seoDesc);
 
@@ -630,7 +630,7 @@
         } else if (others.some(i=>i.checked)) {
           all.checked = false;
         } else {
-          // Nothing selected — auto-check "all"
+          // Nothing selected - auto-check "all"
           all.checked = true;
         }
       }
