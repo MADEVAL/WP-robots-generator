@@ -288,6 +288,8 @@
       lines.push('Disallow: /readme.html');
       lines.push('Disallow: /?s=');
       lines.push('Disallow: /search/');
+      lines.push('Disallow: /feed/');
+      lines.push('Disallow: /trackback/');
     }
     if (security === 'high') {
       lines.push('Disallow: /wp-login.php');
@@ -298,6 +300,9 @@
       lines.push('Disallow: /xmlrpc.php');
       lines.push('Disallow: /?s=');
       lines.push('Disallow: /search/');
+      lines.push('Disallow: /feed/');
+      lines.push('Disallow: /trackback/');
+      lines.push('Disallow: /comments/');
       lines.push('Disallow: /author/');
       lines.push('Disallow: /*?replytocom=*');
     }
