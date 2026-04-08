@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' https://unpkg.com" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Генератор robots.txt для WordPress — онлайн инструмент | GLOBUS.studio</title>
   <meta name="description" content="Быстрый умный генератор robots.txt для WordPress. Выберите поисковые системы, уровень безопасности, сайтмап и плагины. Копируйте или скачивайте готовый файл." />
@@ -10,19 +11,21 @@
   <meta property="og:title" content="Генератор robots.txt для WordPress — GLOBUS.studio" />
   <meta property="og:description" content="Умный генератор robots.txt для WordPress с поддержкой Yandex, Google, Bing. Выбор уровня защиты, сайтмапа и плагинов." />
   <meta property="og:url" content="" id="ogUrl" />
-  <meta property="og:image" content="" />
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 630%27%3E%3Crect width=%271200%27 height=%27630%27 rx=%270%27 fill=%27%232563eb%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-size=%27120%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27800%27%3Erobots.txt%3C/text%3E%3C/svg%3E" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Генератор robots.txt для WordPress" />
   <meta name="twitter:description" content="Соберите robots.txt под ваш сайт на WordPress за минуты." />
+  <meta name="twitter:image" content="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 1200 630%27%3E%3Crect width=%271200%27 height=%27630%27 rx=%270%27 fill=%27%232563eb%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-size=%27120%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27800%27%3Erobots.txt%3C/text%3E%3C/svg%3E" />
   <link rel="canonical" href="" id="canonicalLink" />
   <link rel="alternate" href="" hreflang="ru" id="altRu" />
   <link rel="alternate" href="" hreflang="en" id="altEn" />
   <link rel="alternate" href="" hreflang="x-default" id="altDefault" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 128 128%27%3E%3Crect width=%27128%27 height=%27128%27 rx=%2724%27 fill=%27%232563eb%27/%3E%3Ctext x=%2750%25%27 y=%2758%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-size=%2764%27 fill=%27white%27%3ER%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="https://unpkg.com/@knadh/oat@0/oat.min.css" />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="stylesheet" href="https://unpkg.com/@knadh/oat@0.5.1/oat.min.css" integrity="sha384-/2gqIGK3JlQP5kYvrKfvmGCBI4UFFB4GS09MVDXXsl1uNCXKCo5V+AvHsqt35BXy" crossorigin="anonymous" />
   <link rel="stylesheet" href="./assets/css/styles.css" />
-  <script src="https://unpkg.com/@knadh/oat@0/oat.min.js" defer></script>
-  <script>window.__BUILD_TIME__ = new Date().toISOString();</script>
+  <script src="https://unpkg.com/@knadh/oat@0.5.1/oat.min.js" integrity="sha384-8HmcVM0x1xxqp24p+SnO9TxUAaj2avZd6KxKrGwEq0Dqb9tJiabfApY1DFvQVeu8" crossorigin="anonymous" defer></script>
+  <script>window.__BUILD_TIME__ = '2026-04-08T00:00:00Z';</script>
 </head>
 <body>
   <header class="app-header">
@@ -35,7 +38,7 @@
         <li><button id="langRu" class="small" aria-pressed="true">RU</button></li>
         <li><button id="langEn" class="small outline" aria-pressed="false">EN</button></li>
       </menu>
-      <button id="themeToggle" class="small outline" aria-label="Toggle theme">&#9790;</button>
+      <button id="themeToggle" class="small outline" aria-label="Переключить тему" data-i18n-aria="themeToggle">&#9790;</button>
     </nav>
   </header>
   <section class="hero">
@@ -82,6 +85,9 @@
                 <legend data-i18n="labelPlugins">Плагины WordPress</legend>
                 <label><input type="checkbox" value="woocommerce" /> WooCommerce</label>
                 <label><input type="checkbox" value="edd" /> Easy Digital Downloads</label>
+                <label><input type="checkbox" value="wpml" /> WPML</label>
+                <label><input type="checkbox" value="wpforms" /> WPForms</label>
+                <label><input type="checkbox" value="buddypress" /> BuddyPress</label>
               </fieldset>
               <label>
                 <input type="checkbox" role="switch" id="addSitemap" checked />
@@ -106,10 +112,10 @@
                   <span data-i18n="optYandexClean">Yandex Clean-param (utm_* и др.)</span>
                 </label>
                 <label>
-                  <input type="checkbox" role="switch" id="blockAi" />
+                  <input type="checkbox" role="switch" id="blockAi" aria-describedby="hintAiBlockText" />
                   <span data-i18n="labelAiBlock">Блокировать AI-краулеры</span>
                 </label>
-                <small data-hint data-i18n="hintAiBlock">GPTBot, ClaudeBot, CCBot и другие AI-боты</small>
+                <small data-hint data-i18n="hintAiBlock" id="hintAiBlockText">GPTBot, ClaudeBot, CCBot и другие AI-боты</small>
               </details>
               <menu class="buttons" style="margin-top:1.25rem">
                 <li><button type="button" id="btnGenerate" data-i18n="btnGenerate">Сгенерировать</button></li>
@@ -124,13 +130,14 @@
               <header>
                 <h2 data-i18n="sectionOutput">Результат</h2>
                 <menu class="buttons">
-                  <li><button type="button" id="btnCopy" class="small outline" data-i18n="btnCopy">Копировать</button></li>
-                  <li><button type="button" id="btnDownload" class="small" data-i18n="btnDownload">Скачать</button></li>
+                  <li><button type="button" id="btnCopy" class="small outline" data-i18n="btnCopy" disabled>Копировать</button></li>
+                  <li><button type="button" id="btnDownload" class="small" data-i18n="btnDownload" disabled>Скачать</button></li>
                 </menu>
               </header>
               <div class="output-wrap">
                 <pre tabindex="0"><code id="robotsPreview" aria-live="polite"></code></pre>
               </div>
+              <small class="line-count" id="lineCount"></small>
             </article>
             <div role="alert" data-i18n="disclaimer">Важно: чрезмерные ограничения могут ухудшить индексацию. Проверяйте правила в Google Search Console и Яндекс.Вебмастер.</div>
           </div>
@@ -165,6 +172,18 @@
               <summary data-i18n="faqQ3">Что такое Crawl-delay и когда его использовать?</summary>
               <p data-i18n="faqA3">Директива замедляет скорость краулинга для отдельных ботов (например Bing/Yandex). Используйте, если сервер перегружается от обхода.</p>
             </details>
+            <details>
+              <summary data-i18n="faqQ4">Как проверить robots.txt?</summary>
+              <p data-i18n="faqA4">Используйте инструмент проверки robots.txt в Google Search Console или Яндекс.Вебмастер. Также можно просто открыть yoursite.com/robots.txt в браузере.</p>
+            </details>
+            <details>
+              <summary data-i18n="faqQ5">Зачем блокировать AI-краулеры?</summary>
+              <p data-i18n="faqA5">AI-боты (GPTBot, ClaudeBot, CCBot) скачивают контент для обучения моделей. Блокировка защищает авторские права и снижает нагрузку на сервер.</p>
+            </details>
+            <details>
+              <summary data-i18n="faqQ6">Что будет, если удалить robots.txt?</summary>
+              <p data-i18n="faqA6">Без robots.txt поисковые системы будут обходить все доступные страницы, включая служебные. Это может засорить индекс техническими страницами.</p>
+            </details>
           </div>
         </div>
       </div>
@@ -173,7 +192,7 @@
   <footer class="app-footer">
     <p>
       <span data-i18n="devBy">Разработчик</span> <a href="https://globus.studio" target="_blank" rel="noopener">GLOBUS.studio</a>
-      · <a href="https://globus.studio/contacts/" target="_blank" rel="noopener" data-i18n="orderDev">Заказать разработку</a>
+      · <a href="https://globus.studio/" target="_blank" rel="noopener" data-i18n="orderDev">Заказать разработку</a>
       · <a href="https://t.me/GLOBUSstudio" target="_blank" rel="noopener">Telegram</a>
     </p>
     <small id="buildInfo"></small>

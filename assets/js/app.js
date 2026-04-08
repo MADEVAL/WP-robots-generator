@@ -21,7 +21,6 @@
       secHigh: "Высокий (строже; риск пропуска ресурсов)",
       hintSecurity: "Строже правила могут помешать индексации ресурсов темы/плагинов",
       labelPlugins: "Плагины WordPress",
-      hintPlugins: "Служебные страницы (корзина/оформление) лучше скрыть из индекса",
       labelSitemap: "Добавить Sitemap",
       hintSitemap: "Если используете Yoast/RankMath — обычно sitemap_index.xml",
       labelAdvanced: "Дополнительно",
@@ -53,6 +52,13 @@
       faqA2: "Не рекомендуется — там находятся необходимые стили и скрипты. Строгое закрытие может повредить индексации.",
       faqQ3: "Что такое Crawl-delay и когда его использовать?",
       faqA3: "Директива замедляет скорость краулинга для отдельных ботов (например Bing/Yandex). Используйте, если сервер перегружается от обхода.",
+      faqQ4: "Как проверить robots.txt?",
+      faqA4: "Используйте инструмент проверки robots.txt в Google Search Console или Яндекс.Вебмастер. Также можно просто открыть yoursite.com/robots.txt в браузере.",
+      faqQ5: "Зачем блокировать AI-краулеры?",
+      faqA5: "AI-боты (GPTBot, ClaudeBot, CCBot) скачивают контент для обучения моделей. Блокировка защищает авторские права и снижает нагрузку на сервер.",
+      faqQ6: "Что будет, если удалить robots.txt?",
+      faqA6: "Без robots.txt поисковые системы будут обходить все доступные страницы, включая служебные. Это может засорить индекс техническими страницами.",
+      lineCount: "Строк",
     },
     en: {
       appTitle: "robots.txt Generator for WordPress",
@@ -72,7 +78,6 @@
       secHigh: "High (stricter; may block assets)",
       hintSecurity: "Stricter rules can hurt indexing of theme/plugin assets",
       labelPlugins: "WordPress plugins",
-      hintPlugins: "Utility pages (cart/checkout) are better kept out of index",
       labelSitemap: "Add Sitemap",
       hintSitemap: "For Yoast/RankMath it is usually sitemap_index.xml",
       labelAdvanced: "Advanced",
@@ -104,6 +109,13 @@
       faqA2: "Not recommended — they contain required CSS/JS. Strict blocking harms indexing.",
       faqQ3: "What is Crawl-delay and when to use it?",
       faqA3: "It slows crawl rate for specific bots (e.g., Bing/Yandex). Use if crawling overloads your server.",
+      faqQ4: "How to verify robots.txt?",
+      faqA4: "Use the robots.txt tester in Google Search Console or Yandex.Webmaster. You can also open yoursite.com/robots.txt directly in a browser.",
+      faqQ5: "Why block AI crawlers?",
+      faqA5: "AI bots (GPTBot, ClaudeBot, CCBot) download content to train models. Blocking them protects copyrights and reduces server load.",
+      faqQ6: "What happens if I delete robots.txt?",
+      faqA6: "Without robots.txt, search engines will crawl all accessible pages, including utility ones. This can clutter the index with technical pages.",
+      lineCount: "Lines",
     }
   };
 
@@ -171,17 +183,29 @@
 
     // Update JSON-LD
     renderJsonLd();
+
+    // Update browser URL without reload
+    const newUrl = new URL(location.href);
+    newUrl.searchParams.set('lang', lang);
+    history.replaceState(null, '', newUrl.toString());
+
+    // Localize theme toggle aria-label
+    const themeBtn = $('#themeToggle');
+    if (themeBtn) themeBtn.setAttribute('aria-label', lang === 'ru' ? 'Переключить тему' : 'Toggle theme');
   }
 
   function renderJsonLd(){
+    const t = i18n[state.lang];
     const faqs = [
-      { q: i18n[state.lang].faqQ1, a: i18n[state.lang].faqA1 },
-      { q: i18n[state.lang].faqQ2, a: i18n[state.lang].faqA2 },
-      { q: i18n[state.lang].faqQ3, a: i18n[state.lang].faqA3 },
+      { q: t.faqQ1, a: t.faqA1 },
+      { q: t.faqQ2, a: t.faqA2 },
+      { q: t.faqQ3, a: t.faqA3 },
+      { q: t.faqQ4, a: t.faqA4 },
+      { q: t.faqQ5, a: t.faqA5 },
+      { q: t.faqQ6, a: t.faqA6 },
     ];
 
     const ldApp = {
-      "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: i18n[state.lang].appTitle,
       applicationCategory: "DeveloperApplication",
@@ -193,7 +217,6 @@
     };
 
     const ldFaq = {
-      "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: faqs.map(f => ({
         "@type": "Question",
@@ -202,7 +225,15 @@
       }))
     };
 
-    const graph = { "@graph": [ldApp, ldFaq] };
+    const ldBreadcrumb = {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "GLOBUS.studio", item: "https://globus.studio" },
+        { "@type": "ListItem", position: 2, name: t.appTitle, item: location.origin + location.pathname }
+      ]
+    };
+
+    const graph = { "@context": "https://schema.org", "@graph": [ldApp, ldFaq, ldBreadcrumb] };
     let el = document.getElementById('ldJson');
     if (!el) {
       el = document.createElement('script');
@@ -259,6 +290,8 @@
       lines.push('Disallow: /search/');
     }
     if (security === 'high') {
+      lines.push('Disallow: /wp-login.php');
+      lines.push('Disallow: /readme.html');
       lines.push('Disallow: /wp-includes/');
       lines.push('Disallow: /wp-content/cache/');
       lines.push('Disallow: /wp-json/');
@@ -284,13 +317,27 @@
       pluginRules.add('Disallow: /purchase-confirmation/');
       pluginRules.add('Disallow: /*edd_action=*');
     }
+
+    if (plugins.includes('wpml')) {
+      pluginRules.add('Disallow: /*lang=*');
+      pluginRules.add('Disallow: /wp-admin/admin.php?page=wpml*');
+    }
+
+    if (plugins.includes('wpforms')) {
+      pluginRules.add('Disallow: /*wpforms*');
+    }
+
+    if (plugins.includes('buddypress')) {
+      pluginRules.add('Disallow: /members/');
+      pluginRules.add('Disallow: /activity/');
+      pluginRules.add('Disallow: /groups/');
+    }
     pluginRules.forEach(r => lines.push(r));
 
     return lines;
   }
 
   function buildRobots(){
-    const t = i18n[state.lang];
     const cfg = readForm();
 
     const origin = normalizeUrl(cfg.siteUrl);
@@ -308,6 +355,7 @@
     ];
 
     const hasCrawlDelay = !Number.isNaN(cfg.crawlDelay) && cfg.crawlDelay > 0;
+    const crawlDelayBots = new Set(['*', 'Bingbot', 'Yandex']);
 
     if (useWildcard) {
       const block = ['User-agent: *', ...rules];
@@ -316,7 +364,7 @@
     } else {
       engines.forEach(ua => {
         const block = [`User-agent: ${ua}`, ...rules];
-        if (hasCrawlDelay) block.push(`Crawl-delay: ${cfg.crawlDelay}`);
+        if (hasCrawlDelay && crawlDelayBots.has(ua)) block.push(`Crawl-delay: ${cfg.crawlDelay}`);
         blocks.push(block);
       });
     }
@@ -356,6 +404,43 @@
     return out.trim() + '\n';
   }
 
+  function highlightRobots(text){
+    return text.replace(/^(User-agent:|Disallow:|Allow:|Sitemap:|Host:|Crawl-delay:|Clean-param:)(.*)/gm,
+      (_, directive, rest) => `<span class="rb-dir">${directive}</span><span class="rb-val">${rest}</span>`
+    ).replace(/^(#.*)/gm, '<span class="rb-comment">$1</span>');
+  }
+
+  function updateOutputState(hasContent){
+    const btnCopy = $('#btnCopy');
+    const btnDownload = $('#btnDownload');
+    if (btnCopy) btnCopy.disabled = !hasContent;
+    if (btnDownload) btnDownload.disabled = !hasContent;
+    const counter = $('#lineCount');
+    if (counter) {
+      if (hasContent) {
+        const lines = $('#robotsPreview').textContent.split('\n').length;
+        counter.textContent = `${i18n[state.lang].lineCount}: ${lines}`;
+      } else {
+        counter.textContent = '';
+      }
+    }
+  }
+
+  function validateSitemapUrl(){
+    const smInput = $('#sitemapUrl');
+    const val = smInput.value.trim();
+    if (!val || !$('#addSitemap').checked) {
+      smInput.setAttribute('aria-invalid', 'false');
+      const field = smInput.closest('[data-field]');
+      if (field) field.setAttribute('data-field', '');
+      return;
+    }
+    const ok = isHttpsUrl(val);
+    smInput.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    const field = smInput.closest('[data-field]');
+    if (field) field.setAttribute('data-field', ok ? '' : 'error');
+  }
+
   function generate(){
     // Validate HTTPS site URL first
     const siteInput = $('#siteUrl');
@@ -364,14 +449,32 @@
     siteInput.setAttribute('aria-invalid', ok ? 'false' : 'true');
     const siteField = siteInput.closest('[data-field]');
     if (siteField) siteField.setAttribute('data-field', ok ? '' : 'error');
+
+    validateSitemapUrl();
+
     if (!ok) {
-      siteInput.focus();
-      $('#robotsPreview').textContent = '';
+      // Only focus if triggered by explicit button click, not by input events
+      if (document.activeElement !== siteInput) siteInput.focus();
+      $('#robotsPreview').innerHTML = '';
+      updateOutputState(false);
       return;
     }
 
     const robots = buildRobots();
-    $('#robotsPreview').textContent = robots;
+    const preview = $('#robotsPreview');
+    // Store plain text for copy/download, render highlighted HTML
+    preview.setAttribute('data-plain', robots);
+    preview.innerHTML = highlightRobots(robots.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+    updateOutputState(true);
+
+    // Flash animation
+    const wrap = preview.closest('.output-wrap');
+    if (wrap) {
+      wrap.classList.remove('flash');
+      void wrap.offsetWidth; // reflow
+      wrap.classList.add('flash');
+    }
+
     try { localStorage.setItem('robots_state', JSON.stringify(readForm())); } catch(e) {}
   }
 
@@ -393,7 +496,7 @@
   }
 
   function copyToClipboard(){
-    const txt = $('#robotsPreview').textContent;
+    const txt = $('#robotsPreview').getAttribute('data-plain') || $('#robotsPreview').textContent;
     navigator.clipboard?.writeText(txt).then(()=>{
       toast(state.lang==='ru' ? 'Скопировано' : 'Copied');
     }).catch(()=>{
@@ -406,7 +509,7 @@
   }
 
   function downloadFile(){
-    const blob = new Blob([$('#robotsPreview').textContent], {type: 'text/plain;charset=utf-8'});
+    const blob = new Blob([$('#robotsPreview').getAttribute('data-plain') || $('#robotsPreview').textContent], {type: 'text/plain;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = 'robots.txt';
@@ -417,25 +520,48 @@
   function toast(msg){
     if (typeof ot !== 'undefined' && ot.toast) {
       ot.toast(msg, '', { variant: 'success', duration: 1500 });
+      return;
     }
+    // Fallback: simple visual notification
+    const el = document.createElement('div');
+    el.textContent = msg;
+    el.setAttribute('role', 'status');
+    Object.assign(el.style, {
+      position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
+      background: '#16a34a', color: '#fff', padding: '0.5rem 1.25rem',
+      borderRadius: '8px', fontSize: '0.9rem', zIndex: '9999', opacity: '0',
+      transition: 'opacity .2s'
+    });
+    document.body.appendChild(el);
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 250); }, 1500);
   }
 
   function initTheme(){
     try {
       const saved = localStorage.getItem('theme');
-      if (saved === 'dark') document.body.setAttribute('data-theme', 'dark');
-      else if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.setAttribute('data-theme', 'dark');
+      if (saved === 'dark') {
+        document.documentElement.style.colorScheme = 'dark';
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else if (saved === 'light') {
+        document.documentElement.style.colorScheme = 'light';
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.style.colorScheme = 'dark';
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
     } catch(e) {}
     updateThemeIcon();
   }
 
   function toggleTheme(){
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     if (isDark) {
-      document.body.removeAttribute('data-theme');
+      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.style.colorScheme = 'light';
       try { localStorage.setItem('theme', 'light'); } catch(e) {}
     } else {
-      document.body.setAttribute('data-theme', 'dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.style.colorScheme = 'dark';
       try { localStorage.setItem('theme', 'dark'); } catch(e) {}
     }
     updateThemeIcon();
@@ -444,8 +570,14 @@
   function updateThemeIcon(){
     const btn = $('#themeToggle');
     if (!btn) return;
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     btn.textContent = isDark ? '\u2600' : '\u263E';
+  }
+
+  let _debounceTimer = null;
+  function debouncedGenerate(){
+    clearTimeout(_debounceTimer);
+    _debounceTimer = setTimeout(generate, 180);
   }
 
   function initEvents(){
@@ -468,7 +600,7 @@
           state.autoSitemap = true;
         }
       }
-      generate();
+      debouncedGenerate();
     });
 
     $('#addSitemap').addEventListener('change', ()=>{
@@ -480,7 +612,7 @@
       const v = e.target.value.trim();
       // If user clears the field, re-enable auto mode; otherwise stop auto updates
       state.autoSitemap = v === '';
-      generate();
+      debouncedGenerate();
     });
 
     // Engines: if "all" is checked, uncheck others; if any other checked, uncheck all
@@ -492,6 +624,9 @@
           others.forEach(i=> i.checked = false);
         } else if (others.some(i=>i.checked)) {
           all.checked = false;
+        } else {
+          // Nothing selected — auto-check "all"
+          all.checked = true;
         }
       }
       generate();
@@ -504,7 +639,7 @@
 
     // Advanced section listeners
     $('#useYandexHost').addEventListener('change', generate);
-    $('#crawlDelay').addEventListener('input', generate);
+    $('#crawlDelay').addEventListener('input', debouncedGenerate);
     $('#yandexClean').addEventListener('change', generate);
     $('#blockAi').addEventListener('change', generate);
 
