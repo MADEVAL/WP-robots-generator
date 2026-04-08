@@ -6,6 +6,9 @@
     ru: {
       appTitle: "Генератор robots.txt для WordPress",
       appSubtitle: "Соберите корректный robots.txt за минуты",
+      heroTitle: "Создайте идеальный robots.txt для WordPress",
+      heroSub: "Умный генератор с поддержкой Google, Yandex, Bing и AI-краулеров. Выберите нужные параметры и получите готовый файл за секунды.",
+      badgeFree: "Бесплатно",
       sectionSetup: "Настройки",
       sectionOutput: "Результат",
       labelSiteUrl: "Адрес сайта (https://example.com)",
@@ -25,10 +28,12 @@
       optYandexHost: "Директива Host для Yandex",
       optCrawlDelay: "Crawl-delay (Bing/Yandex)",
       optYandexClean: "Yandex Clean-param (utm_* и др.)",
+      labelAiBlock: "Блокировать AI-краулеры",
+      hintAiBlock: "GPTBot, ClaudeBot, CCBot и другие AI-боты",
       btnGenerate: "Сгенерировать",
       btnReset: "Сброс",
       btnCopy: "Копировать",
-      btnDownload: "Скачать robots.txt",
+      btnDownload: "Скачать",
       disclaimer: "Важно: чрезмерные ограничения могут ухудшить индексацию. Проверяйте правила в Google Search Console и Яндекс.Вебмастер.",
       devBy: "Разработчик",
       orderDev: "Заказать разработку",
@@ -52,6 +57,9 @@
     en: {
       appTitle: "robots.txt Generator for WordPress",
       appSubtitle: "Build a proper robots.txt in minutes",
+      heroTitle: "Build the perfect robots.txt for WordPress",
+      heroSub: "Smart generator supporting Google, Yandex, Bing, and AI crawlers. Configure your settings and get a ready file in seconds.",
+      badgeFree: "Free",
       sectionSetup: "Setup",
       sectionOutput: "Output",
       labelSiteUrl: "Site URL (https://example.com)",
@@ -71,10 +79,12 @@
       optYandexHost: "Yandex Host directive",
       optCrawlDelay: "Crawl-delay (Bing/Yandex)",
       optYandexClean: "Yandex Clean-param (utm_* etc.)",
+      labelAiBlock: "Block AI crawlers",
+      hintAiBlock: "GPTBot, ClaudeBot, CCBot and other AI bots",
       btnGenerate: "Generate",
       btnReset: "Reset",
       btnCopy: "Copy",
-      btnDownload: "Download robots.txt",
+      btnDownload: "Download",
       disclaimer: "Note: overly strict rules can harm indexing. Validate in Search Console and Yandex.Webmaster.",
       devBy: "Built by",
       orderDev: "Hire us",
@@ -106,7 +116,7 @@
 
   function setLang(lang){
     state.lang = lang;
-    localStorage.setItem('lang', lang);
+    try { localStorage.setItem('lang', lang); } catch(e) {}
     document.documentElement.lang = lang;
 
     // Swap UI text
@@ -124,7 +134,7 @@
     const metaDesc = $('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', i18n[lang].seoDesc);
     const ogTitle = $('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', i18n[lang].seoTitle.replace(' — online tool',' — GLOBUS.studio'));
+    if (ogTitle) ogTitle.setAttribute('content', i18n[lang].appTitle + ' — GLOBUS.studio');
     const ogDesc = $('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', i18n[lang].seoDesc);
 
@@ -148,10 +158,16 @@
 
     altRu && altRu.setAttribute('href', ruUrl.toString());
     altEn && altEn.setAttribute('href', enUrl.toString());
+    const altDefault = $('#altDefault');
+    altDefault && altDefault.setAttribute('href', enUrl.toString());
 
-    // Toggle pressed state on language buttons
+    // Toggle pressed state and oat styling on language buttons
     $('#langRu')?.setAttribute('aria-pressed', lang==='ru' ? 'true' : 'false');
+    $('#langRu')?.classList.toggle('outline', lang !== 'ru');
     $('#langEn')?.setAttribute('aria-pressed', lang==='en' ? 'true' : 'false');
+    $('#langEn')?.classList.toggle('outline', lang !== 'en');
+    const langSwitch = $('#langSwitch');
+    if (langSwitch) langSwitch.setAttribute('aria-label', lang==='ru' ? 'Переключение языка' : 'Language switch');
 
     // Update JSON-LD
     renderJsonLd();
@@ -222,7 +238,8 @@
     const crawlDelayVal = $('#crawlDelay').value.trim();
     const crawlDelay = crawlDelayVal === '' ? NaN : parseInt(crawlDelayVal, 10);
     const yandexClean = $('#yandexClean').checked;
-    return { siteUrl, engines, security, plugins, addSitemap, sitemapUrl, useYandexHost, crawlDelay, yandexClean };
+    const blockAi = $('#blockAi').checked;
+    return { siteUrl, engines, security, plugins, addSitemap, sitemapUrl, useYandexHost, crawlDelay, yandexClean, blockAi };
   }
 
   function buildRules({security, plugins}){
@@ -252,28 +269,25 @@
       lines.push('Disallow: /*?replytocom=*');
     }
 
-    // Plugin-aware suggestions
+    // Plugin-aware suggestions (deduplicate common rules)
+    const pluginRules = new Set();
     if (plugins.includes('woocommerce')) {
-      lines.push('Disallow: /cart/');
-      lines.push('Disallow: /checkout/');
-      lines.push('Disallow: /my-account/');
-      lines.push('Disallow: /*add-to-cart=*');
+      pluginRules.add('Disallow: /cart/');
+      pluginRules.add('Disallow: /checkout/');
+      pluginRules.add('Disallow: /my-account/');
+      pluginRules.add('Disallow: /*add-to-cart=*');
     }
 
     if (plugins.includes('edd')) {
-      lines.push('Disallow: /cart/');
-      lines.push('Disallow: /checkout/');
-      lines.push('Disallow: /purchase-confirmation/');
-      lines.push('Disallow: /*edd_action=*');
+      pluginRules.add('Disallow: /cart/');
+      pluginRules.add('Disallow: /checkout/');
+      pluginRules.add('Disallow: /purchase-confirmation/');
+      pluginRules.add('Disallow: /*edd_action=*');
     }
-
-    // Cache/optimizer plugins typically safe to ignore in robots; high only
-    // No specific blocks for Yoast/RankMath/Elementor/CF7 by default
+    pluginRules.forEach(r => lines.push(r));
 
     return lines;
   }
-
-  function unique(arr){ return Array.from(new Set(arr)); }
 
   function buildRobots(){
     const t = i18n[state.lang];
@@ -293,21 +307,25 @@
       `# https://globus.studio`
     ];
 
+    const hasCrawlDelay = !Number.isNaN(cfg.crawlDelay) && cfg.crawlDelay > 0;
+
     if (useWildcard) {
-      blocks.push(['User-agent: *', ...rules]);
+      const block = ['User-agent: *', ...rules];
+      if (hasCrawlDelay) block.push(`Crawl-delay: ${cfg.crawlDelay}`);
+      blocks.push(block);
     } else {
       engines.forEach(ua => {
-        blocks.push([`User-agent: ${ua}`, ...rules]);
+        const block = [`User-agent: ${ua}`, ...rules];
+        if (hasCrawlDelay) block.push(`Crawl-delay: ${cfg.crawlDelay}`);
+        blocks.push(block);
       });
     }
 
-    // Crawl-delay for some bots
-    if (!Number.isNaN(cfg.crawlDelay) && cfg.crawlDelay > 0) {
-      const targets = useWildcard ? ['*'] : engines;
-      targets.forEach(ua => {
-        // Attach as separate blocks to avoid mixing ordering
-        blocks.push([`User-agent: ${ua}`, `Crawl-delay: ${cfg.crawlDelay}`]);
-      });
+    // AI crawlers block
+    if (cfg.blockAi) {
+      const aiBots = ['GPTBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'CCBot', 'Bytespider', 'anthropic-ai', 'Google-Extended', 'FacebookBot', 'PerplexityBot'];
+      const aiBlock = aiBots.map(bot => `User-agent: ${bot}`).concat(['Disallow: /']);
+      blocks.push(aiBlock);
     }
 
     // Yandex Host and Clean-param only if Yandex is targeted or wildcard
@@ -343,19 +361,18 @@
     const siteInput = $('#siteUrl');
     const val = siteInput.value.trim();
     const ok = isHttpsUrl(val);
-    siteInput.classList.toggle('invalid', !ok);
     siteInput.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    const siteField = siteInput.closest('[data-field]');
+    if (siteField) siteField.setAttribute('data-field', ok ? '' : 'error');
     if (!ok) {
       siteInput.focus();
-      siteInput.classList.add('pulse');
-      setTimeout(()=> siteInput.classList.remove('pulse'), 1400);
       $('#robotsPreview').textContent = '';
       return;
     }
 
     const robots = buildRobots();
     $('#robotsPreview').textContent = robots;
-    localStorage.setItem('robots_state', JSON.stringify(readForm()));
+    try { localStorage.setItem('robots_state', JSON.stringify(readForm())); } catch(e) {}
   }
 
   function restore(){
@@ -371,6 +388,7 @@
       $('#useYandexHost').checked = !!saved.useYandexHost;
       $('#crawlDelay').value = saved.crawlDelay || '';
       $('#yandexClean').checked = !!saved.yandexClean;
+      $('#blockAi').checked = !!saved.blockAi;
     } catch(e) {}
   }
 
@@ -397,22 +415,51 @@
   }
 
   function toast(msg){
-    const d = document.createElement('div');
-    d.textContent = msg; d.style.position='fixed'; d.style.left='50%'; d.style.bottom='20px'; d.style.transform='translateX(-50%)'; d.style.background='rgba(17,24,39,.9)'; d.style.color='#fff'; d.style.padding='8px 12px'; d.style.borderRadius='8px'; d.style.zIndex='1000';
-    document.body.appendChild(d);
-    setTimeout(()=>d.remove(), 1500);
+    if (typeof ot !== 'undefined' && ot.toast) {
+      ot.toast(msg, '', { variant: 'success', duration: 1500 });
+    }
+  }
+
+  function initTheme(){
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') document.body.setAttribute('data-theme', 'dark');
+      else if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.setAttribute('data-theme', 'dark');
+    } catch(e) {}
+    updateThemeIcon();
+  }
+
+  function toggleTheme(){
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.body.removeAttribute('data-theme');
+      try { localStorage.setItem('theme', 'light'); } catch(e) {}
+    } else {
+      document.body.setAttribute('data-theme', 'dark');
+      try { localStorage.setItem('theme', 'dark'); } catch(e) {}
+    }
+    updateThemeIcon();
+  }
+
+  function updateThemeIcon(){
+    const btn = $('#themeToggle');
+    if (!btn) return;
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    btn.textContent = isDark ? '\u2600' : '\u263E';
   }
 
   function initEvents(){
     $('#langRu').addEventListener('click', ()=> setLang('ru'));
     $('#langEn').addEventListener('click', ()=> setLang('en'));
+    $('#themeToggle')?.addEventListener('click', toggleTheme);
 
     $('#siteUrl').addEventListener('input', (e)=>{
       const val = e.target.value.trim();
       const sm = $('#sitemapUrl');
       const httpsOk = isHttpsUrl(val);
-      e.target.classList.toggle('invalid', !httpsOk && val.length>0);
       e.target.setAttribute('aria-invalid', (!httpsOk && val.length>0) ? 'true' : 'false');
+      const siteField = e.target.closest('[data-field]');
+      if (siteField) siteField.setAttribute('data-field', (!httpsOk && val.length>0) ? 'error' : '');
       // Auto-update sitemap if it's currently auto-generated or empty
       const currentDefault = defaultSitemap(val);
       if (httpsOk) {
@@ -431,8 +478,8 @@
 
     $('#sitemapUrl').addEventListener('input', (e)=>{
       const v = e.target.value.trim();
-      // If user edits sitemap manually, stop auto updates
-      state.autoSitemap = false;
+      // If user clears the field, re-enable auto mode; otherwise stop auto updates
+      state.autoSitemap = v === '';
       generate();
     });
 
@@ -453,12 +500,13 @@
     $('#btnGenerate').addEventListener('click', generate);
     $('#btnCopy').addEventListener('click', copyToClipboard);
     $('#btnDownload').addEventListener('click', downloadFile);
-    $('#btnReset').addEventListener('click', ()=>{ localStorage.removeItem('robots_state'); location.reload(); });
+    $('#btnReset').addEventListener('click', ()=>{ try { localStorage.removeItem('robots_state'); } catch(e){} location.reload(); });
 
     // Advanced section listeners
     $('#useYandexHost').addEventListener('change', generate);
     $('#crawlDelay').addEventListener('input', generate);
     $('#yandexClean').addEventListener('change', generate);
+    $('#blockAi').addEventListener('change', generate);
 
     // Plugins and security listeners
     $$('#plugins input[type="checkbox"]').forEach(i=> i.addEventListener('change', generate));
@@ -466,6 +514,7 @@
   }
 
   function init(){
+    initTheme();
     setLang(state.lang);
     restore();
     // Prefill sitemap if possible
