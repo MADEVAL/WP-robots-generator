@@ -1,5 +1,8 @@
 # robots.txt Generator for WordPress
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Web App](https://img.shields.io/badge/app-robots%20generator-blue.svg)](https://robots.globus.studio)
+
 > Smart, free, client-side robots.txt generator built specifically for WordPress sites. No backend, no tracking, no signup - just open and go.
 
 **[Live Demo →](https://robots.globus.studio)**
